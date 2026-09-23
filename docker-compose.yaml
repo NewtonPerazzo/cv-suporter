@@ -1,0 +1,11 @@
+services:
+  cv-suporter:
+    build:
+      context: .
+    image: cv-suporter:dev
+    container_name: cv-suporter
+    ports:
+      - "8004:8080"
+    env_file:
+      - .env
+    restart: unless-stopped
