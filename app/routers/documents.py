@@ -7,6 +7,7 @@ documents_router = APIRouter(prefix="/api/v1")
 
 @documents_router.post("/documents", tags=["Documents"])
 async def post_documents(
+    question: str,
     data: list[UploadFile] = File(
         ...,
         description="List of files to upload",
@@ -18,5 +19,5 @@ async def post_documents(
         },
     ),
 ) -> dict:
-    documents = await documents_service.post_documents(data)
+    documents = await documents_service.post_documents(question=question, documents=data)
     return { "message": documents }
