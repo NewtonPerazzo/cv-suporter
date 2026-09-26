@@ -218,15 +218,15 @@ class DocumentsService:
             if not paragraph:
                 continue
 
-            # Se ainda cabe no chunk atual
+            # If the paragraph still fits in the current chunk
             if (
                 len(current_chunk) + len(paragraph)
                 <= chunk_size
             ):
                 current_chunk += paragraph + "\n"
 
-            # Se ultrapassaria o limite,
-            # fecha o chunk atual
+            # If it would exceed the limit,
+            # close the current chunk
             else:
 
                 if current_chunk:
@@ -360,30 +360,30 @@ class DocumentsService:
 """
 
         prompt = f"""
-Você está analisando UM ÚNICO candidato.
+You are analyzing ONE SINGLE candidate.
 
-Utilize exclusivamente as informações explicitamente presentes
-no currículo fornecido abaixo.
+Use only the information explicitly present
+in the resume provided below.
 
-Regras:
+Rules:
 
-- Não invente tecnologias.
-- Não invente experiências.
-- Não deduza conhecimentos que não estejam explicitamente escritos.
-- Extraia apenas informações relevantes para a pergunta.
-- Não transforme experiência front-end em experiência back-end.
-- Não considere Docker, Git ou CI/CD como evidência de experiência back-end.
-- Se uma tecnologia não estiver explicitamente mencionada no contexto,
-  não a inclua.
-- Se não houver tecnologias back-end explicitamente mencionadas,
-  retorne backend_technologies como lista vazia.
-- Se não houver experiências back-end explicitamente mencionadas,
-  retorne backend_experiences como lista vazia.
+- Do not invent technologies.
+- Do not invent experience.
+- Do not infer knowledge that is not explicitly stated.
+- Extract only information relevant to the question.
+- Do not turn front-end experience into back-end experience.
+- Do not consider Docker, Git or CI/CD as evidence of back-end experience.
+- If a technology is not explicitly mentioned in the context,
+  do not include it.
+- If no back-end technologies are explicitly mentioned,
+  return backend_technologies as an empty list.
+- If no back-end experience is explicitly mentioned,
+  return backend_experiences as an empty list.
 
-CURRÍCULO:
+RESUME:
 {context}
 
-PERGUNTA:
+QUESTION:
 {question}
 """
 
@@ -419,21 +419,21 @@ PERGUNTA:
     ) -> str:
 
         prompt = f"""
-    Responda à pergunta do usuário utilizando exclusivamente
-    a análise estruturada dos candidatos fornecida abaixo.
+    Answer the user's question using only
+    the structured candidate analysis provided below.
 
-    Não invente informações.
-    Não adicione tecnologias ou experiências que não estejam
-    presentes na análise.
-    Se não houver informação suficiente, diga isso explicitamente.
+    Do not invent information.
+    Do not add technologies or experience that are not
+    present in the analysis.
+    If there is not enough information, state that explicitly.
 
-    PERGUNTA:
+    QUESTION:
     {question}
 
-    ANÁLISE DOS CANDIDATOS:
+    CANDIDATE ANALYSIS:
     {analysis.model_dump_json(indent=2)}
 
-    Forneça uma resposta direta e objetiva.
+    Provide a direct and objective answer.
     """
 
         response = ollama.chat(

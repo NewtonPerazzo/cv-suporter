@@ -1,11 +1,37 @@
 services:
-  cv-suporter:
-    build:
-      context: .
-    image: cv-suporter:dev
-    container_name: cv-suporter
+  api:
+    build: .
     ports:
-      - "8004:8080"
+      - "8000:8080"
+
+    volumes:
+      - ./app:/usr/local/app/app
+
     env_file:
       - .env
-    restart: unless-stopped
+
+    command: >
+      uvicorn app.main:app
+      --host 0.0.0.0
+      --port 8080
+      --reload
+
+    depends_on:
+      - postgres
+
+  postgres:
+    image: pgvector/pgvector:pg16
+
+    environment:
+      POSTGRES_DB: rag_db
+      POSTGRES_USER: rag_user
+      POSTGRES_PASSWORD: rag_password
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
