@@ -5,6 +5,7 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://rag_user:${POSTGRES_PASSWORD}@postgres:5432/rag_db
       OLLAMA_HOST: ${OLLAMA_HOST}
+      OLLAMA_API_KEY: ${OLLAMA_KEY}
       CHAT_MODEL: ${CHAT_MODEL:-qwen3:1.7b}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-nomic-embed-text}
       CHAT_CONTEXT_TOKENS: ${CHAT_CONTEXT_TOKENS:-4096}
