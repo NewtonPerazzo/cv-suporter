@@ -1,5 +1,7 @@
 FROM python:3.13-slim
 
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+
 WORKDIR /usr/local/app
 
 COPY requirements.txt ./
@@ -12,4 +14,4 @@ EXPOSE 8080
 RUN useradd --create-home app
 USER app
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["sh", "-c", "exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080}"]

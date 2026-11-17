@@ -1,0 +1,49 @@
+services:
+  api:
+    build: .
+    container_name: cv-supporter-api
+    environment:
+      DATABASE_URL: postgresql+psycopg://rag_user:${POSTGRES_PASSWORD}@postgres:5432/rag_db
+      OLLAMA_HOST: ${OLLAMA_HOST}
+      CHAT_MODEL: ${CHAT_MODEL:-qwen3:1.7b}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-nomic-embed-text}
+      CHAT_CONTEXT_TOKENS: ${CHAT_CONTEXT_TOKENS:-4096}
+      CHAT_MAX_OUTPUT_TOKENS: ${CHAT_MAX_OUTPUT_TOKENS:-600}
+      OLLAMA_TIMEOUT_SECONDS: ${OLLAMA_TIMEOUT_SECONDS:-300}
+      SESSION_TTL_SECONDS: "1800"
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      ENABLE_STUDY_ROUTES: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - private
+      - caddy
+    restart: unless-stopped
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: rag_db
+      POSTGRES_USER: rag_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rag_user -d rag_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - private
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  private:
+    internal: true
+  caddy:
+    external: true
+    name: weather-infra_default

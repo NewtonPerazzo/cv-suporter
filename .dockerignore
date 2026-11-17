@@ -10,3 +10,6 @@ __pycache__
 .idea
 .vscode
 tests
+cv-suporter-front
+node_modules
+artifacts

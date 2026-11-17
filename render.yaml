@@ -1,0 +1,71 @@
+# Paid services: review plans before creating this Blueprint.
+services:
+  - type: web
+    name: cv-supporter-api
+    runtime: docker
+    plan: starter
+    region: virginia
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_HOST
+        fromService:
+          type: pserv
+          name: cv-supporter-db
+          property: host
+      - key: DATABASE_PASSWORD
+        fromService:
+          type: pserv
+          name: cv-supporter-db
+          envVarKey: POSTGRES_PASSWORD
+      - key: DATABASE_URL
+        value: ""
+      - key: OLLAMA_ADDRESS
+        fromService:
+          type: pserv
+          name: cv-supporter-ollama
+          property: hostport
+      - key: CORS_ORIGINS
+        sync: false
+      - key: SESSION_TTL_SECONDS
+        value: "1800"
+      - key: ENABLE_STUDY_ROUTES
+        value: "false"
+
+  - type: pserv
+    name: cv-supporter-db
+    runtime: docker
+    plan: starter
+    region: virginia
+    dockerfilePath: ./docker/postgres/Dockerfile
+    envVars:
+      - key: POSTGRES_DB
+        value: rag_db
+      - key: POSTGRES_USER
+        value: rag_user
+      - key: POSTGRES_PASSWORD
+        generateValue: true
+      - key: PGDATA
+        value: /var/lib/postgresql/data/pgdata
+    disk:
+      name: database
+      mountPath: /var/lib/postgresql/data
+      sizeGB: 1
+
+  - type: pserv
+    name: cv-supporter-ollama
+    runtime: docker
+    plan: standard
+    region: virginia
+    dockerfilePath: ./docker/ollama/Dockerfile
+    envVars:
+      - key: OLLAMA_HOST
+        value: 0.0.0.0:11434
+      - key: OLLAMA_NUM_PARALLEL
+        value: "1"
+      - key: OLLAMA_MAX_LOADED_MODELS
+        value: "1"
+    disk:
+      name: models
+      mountPath: /root/.ollama
+      sizeGB: 10
